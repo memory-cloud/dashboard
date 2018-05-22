@@ -13,7 +13,7 @@ import {
 	BrowserRouter
 } from 'react-router-dom'
 
-const httpLink = new createHttpLink({uri: 'http://localhost:3000/graphql'}) // https://unity-cloudsave-development.herokuapp.com/graphql
+const httpLink = new createHttpLink({uri: 'https://unity-cloudsave-development.herokuapp.com/graphql'})
 
 const authLink = setContext((_, {headers}) => {
 	// get the authentication token from local storage if it exists
