@@ -1,0 +1,28 @@
+language: node_js
+
+node_js:
+- '8'
+
+cache:
+  directories:
+  - node_modules
+
+addons:
+  sonarcloud:
+    organization: "memory-cloud"
+
+install:
+- npm install
+
+script:
+- sonar-scanner -Dsonar.projectKey=dashboard -Dsonar.organization=memory-cloud -Dsonar.sources=./src -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN
+- npm run build
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GIT_TOKEN
+  local-dir: ./build/
+  keep-history: true
+  on:
+    branch: master
