@@ -33,7 +33,7 @@ const client = new ApolloClient({
 })
 
 ReactDOM.render(
-	<BrowserRouter>
+	<BrowserRouter basename="/dashboard">
 		<ApolloProvider client={client}>
 			<Home/>
 		</ApolloProvider>

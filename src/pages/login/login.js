@@ -94,7 +94,7 @@ class Login extends Component {
 			}
 		}
 		if (localStorage.getItem(AUTH_TOKEN)) {
-			this.props.history.push('/dashboard')
+			this.props.history.push('/dashboard/dashboard')
 		}
 	}
 

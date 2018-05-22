@@ -9,9 +9,9 @@ const authToken = localStorage.getItem(AUTH_TOKEN)
 const NavBar = ({onChange, onSearch}) => (
 	<div className="NavBar">
 		<div className="logo ms-font-xl">
-			<Link href={authToken ? '/dashboard' : '/'}><strong>Memory Cloud</strong></Link>
+			<Link href={authToken ? '/dashboard/dashboard' : '/dashboard'}><strong>Memory Cloud</strong></Link>
 			{authToken ? (
-				<Link href={authToken ? '/dashboard' : '/'}> | Games</Link>
+				<Link href="/dashboard/dashboard"> | Games</Link>
 				) : ('')}
 		</div>
 		{authToken ? (
@@ -20,12 +20,12 @@ const NavBar = ({onChange, onSearch}) => (
 				onClick={() => {
 					localStorage.removeItem(AUTH_TOKEN)
 				}}
-			    href="/"
+			    href="/dashboard"
 			>
 				Logout
 			</ActionButton>
 			) : (
-			<Link href="/login">Login</Link>
+			<Link href="/dashboard/login">Login</Link>
 			)
 		}
 

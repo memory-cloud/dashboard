@@ -45,7 +45,7 @@ class GamePage extends Component {
 			}
 		})
 		if (!result.data.error) {
-			this.props.history.push('/game/' + appid)
+			this.props.history.push('/dashboard/game/' + appid)
 		}
 	}
 }

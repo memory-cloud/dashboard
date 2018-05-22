@@ -29,17 +29,16 @@ class Dashboard extends Component {
 				<ActionButton
 					iconProps={ { iconName: 'Add' } }
 					text='New game'
-				    href='/newgame'
+				    href='/dashboard/newgame'
 				>
 				</ActionButton>
-				{/*{games[0] ? games.map((game) => <GameButton appid={game.appid} key={game.appid}/>) : (<div>No games</div>)}*/}
 			</div>
 		)
 	}
 
 	_onRenderCell(item, index) {
 		return (
-				<Link href={'/game/'+item.appid}>
+				<Link href={'/dashboard/game/'+item.appid}>
 					<CompoundButton>
 						{item.appid}
 					</CompoundButton>
