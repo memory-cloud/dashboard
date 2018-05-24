@@ -2,24 +2,20 @@ import React, {Component} from 'react'
 import {graphql} from 'react-apollo'
 import gql from 'graphql-tag'
 import {withApollo} from 'react-apollo'
-import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 import Loading from '../../components/Loading'
+import {CompoundButton, ActionButton} from 'office-ui-fabric-react/lib/Button'
 
 class Achievement extends Component {
-	constructor (props) {
+	constructor(props){
 		super(props)
 		this.state = {
-			achievements: props.data.game? props.data.game.achievements : [{_id: '', title: '', description: ''}],
-			mensagem: '',
-			error: '',
-			info: ''
+			achievements: props.data.game ? props.data.game.achievements : [{_id: '', title: '', description: ''}],
+			saving: false
 		}
 	}
 
-	onAchievementChanged = achievements => this.setState(() => ({achievements: achievements}))
-
 	componentWillReceiveProps(props) {
-		if (!props.data.loading) {
+		if (!props.data.loading && !this.state.saving) {
 			this.setState({achievements: props.data.game.achievements})
 		}
 	}
@@ -45,29 +41,30 @@ class Achievement extends Component {
 	}
 
 	upsertAchievements  = async () => {
+		this.setState({saving: true})
 		try {
-			this.setState({error: '', mensagem: '', info: 'Saving'})
+			this.props.feedStore.setInfo('Saving')
+
 			const {achievements} = this.state
 
-			const achievementsUpdate = achievements.map(achievement => ({
+			const update = achievements.map((achievement)=>({
 				_id: achievement._id,
 				title: achievement.title,
 				description: achievement.description
 			}))
 
-			let result = await this.props.client.mutate({
+			await this.props.client.mutate({
 				mutation: MUTATION_UPSERTACHIEVEMENTS,
 				variables: {
 					appid: this.props.appid,
-					achievements: achievementsUpdate
+					achievements: update
 				}
 			})
 
-			this.setState({mensagem: 'Achievements updated', error: '', info: ''})
-			this.onAchievementChanged(result.data.upsertAchievements)
+			this.props.feedStore.setSuccess('Achievements updated')
+			this.props.data.refetch()
 		} catch (err) {
-			console.log(err)
-			this.setState({error: 'Something went wrong', mensagem: '', info: ''})
+			this.props.feedStore.setError(err.graphQLErrors[0].message, 10)
 		}
 	}
 
@@ -84,6 +81,11 @@ class Achievement extends Component {
 
 		return (
 			<div>
+				<ActionButton
+					iconProps={ { iconName: 'Add' } }
+					text='new'
+					onClick={this.handleAddAchievement}
+				/>
 				{this.state.achievements.map((achievement, idx) => (
 					<div key={idx}>
 						<input
@@ -93,12 +95,14 @@ class Achievement extends Component {
 						    readOnly
 						/>
 						<input
+							name="title"
 							type="text"
 							placeholder={`Achievement #${idx + 1} title`}
 							value={achievement.title}
 							onChange={this.handleAchievementTitleChange(idx)}
 						/>
 						<input
+							name="description"
 							type="text"
 							placeholder={`Achievement #${idx + 1} description`}
 							value={achievement.description}
@@ -106,38 +110,7 @@ class Achievement extends Component {
 						/>
 					</div>
 				))}
-				<button className="pointer mr2 button" onClick={this.upsertAchievements}>save achievements</button>
-				<button type="button" onClick={this.handleAddAchievement} className="small">Add Shareholder</button>
-				<br/>
-				{this.state.mensagem ? (
-						<MessageBar
-							messageBarType={ MessageBarType.success }
-							isMultiline={ false }
-						>
-							{this.state.mensagem}
-						</MessageBar>
-					) : (
-						''
-					)}
-
-				{this.state.error ? (
-						<MessageBar
-							messageBarType={ MessageBarType.error }
-							isMultiline={ false }
-						>
-							{this.state.error}
-						</MessageBar>
-					) : (
-						''
-					)}
-
-				{this.state.info ? (
-						<MessageBar>
-							{this.state.info}
-						</MessageBar>
-					) : (
-						''
-					)}
+				<CompoundButton onClick={this.upsertAchievements} primary={ true }>save achievements</CompoundButton>
 			</div>
 		)
 	}

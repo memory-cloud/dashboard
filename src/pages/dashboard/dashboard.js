@@ -2,9 +2,8 @@ import React, { Component } from 'react'
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import Loading from '../../components/Loading'
-import { List } from 'office-ui-fabric-react/lib/List'
-import { Link } from 'office-ui-fabric-react/lib/Link'
 import {CompoundButton, ActionButton} from 'office-ui-fabric-react/lib/Button'
+import { withRouter } from 'react-router'
 
 class Dashboard extends Component {
 	render() {
@@ -21,29 +20,19 @@ class Dashboard extends Component {
 		var games = data.games
 
 		return (
-			<div style={ { height: '70px' } }>
-				<List
-					items={ games }
-					onRenderCell={ this._onRenderCell }
-				/>
+			<div>
 				<ActionButton
 					iconProps={ { iconName: 'Add' } }
 					text='New game'
-				    href='/dashboard/newgame'
-				>
-				</ActionButton>
+					onClick={()=>this.props.history.push('/newgame')}
+				/>
+				{games.map(game => (
+					<CompoundButton onClick={ () => this.props.history.push('/game/' + game.appid )} key={game.appid}>
+						{game.appid}
+					</CompoundButton>
+				))}
 			</div>
 		)
-	}
-
-	_onRenderCell(item, index) {
-		return (
-				<Link href={'/dashboard/game/'+item.appid}>
-					<CompoundButton>
-						{item.appid}
-					</CompoundButton>
-				</Link>
-		);
 	}
 }
 
@@ -55,4 +44,4 @@ const QUERY_GAMES = gql`
     }
 `
 
-export default graphql(QUERY_GAMES)(Dashboard)
+export default graphql(QUERY_GAMES)(withRouter(Dashboard))

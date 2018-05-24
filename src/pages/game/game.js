@@ -5,7 +5,6 @@ import Loading from '../../components/Loading'
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import Achievement from '../achievement'
 import Stats from '../stats'
-
 class GamePage extends Component {
 	render() {
 		const {data} = this.props
@@ -37,7 +36,7 @@ class GamePage extends Component {
 						</div>
 					</PivotItem>
 					<PivotItem linkText='Achievements'>
-						<Achievement appid={game.appid} />
+						<Achievement appid={game.appid} feedStore={this.props.feedStore} />
 					</PivotItem>
 					<PivotItem linkText='Stats'>
 						<Stats appid={game.appid} />
@@ -58,7 +57,7 @@ const QUERY_GAME = gql`
 `
 
 export default graphql(QUERY_GAME, {
-	options: (props) => {
-		return {variables: {appid: props.match.params.id}}
+	options: ({appid}) => {
+		return {variables: {appid: appid}}
 	}
 })(GamePage)

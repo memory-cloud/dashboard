@@ -1,41 +1,83 @@
 import React, {Component} from 'react'
-import NavBar from '../../containers/header'
+import NavBar from '../../components/NavBar'
 import {Fabric} from 'office-ui-fabric-react/lib/Fabric'
-import Footer from '../../containers/Footer'
+import Footer from '../../components/Footer'
 import './style.css'
-import { Switch, Route } from 'react-router'
+import {Switch, Route} from 'react-router'
 import Dashboard from '../../pages/dashboard'
 import Login from '../../pages/login'
-import NewGame from '../../pages/newgame'
+import NewGame from '../../pages/NewGame'
 import GamePage from '../../pages/game'
 import PageNotFound from '../../pages/PageNotFound'
-import { initializeIcons } from '@uifabric/icons';
+import {initializeIcons} from '@uifabric/icons';
+import {Provider} from 'unstated'
+import {Subscribe} from 'unstated'
+import AuthContainer from '../../containers/AuthContainer'
+import FeedbackContainer from '../../containers/FeedbackContainer'
+import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 
 // Register icons and pull the fonts from the default SharePoint cdn:
 initializeIcons()
+var auth = new AuthContainer()
+var feed = new FeedbackContainer()
+
 class App extends Component {
 	render() {
 		return (
-			<Fabric className="App">
-				<div className="header">
-					<NavBar />
-				</div>
-				<div className="body">
-					<div className="content">
-						<Switch>
-							{/*<Route exact path="/about" component={About} />*/}
-							<Route exact path="/dashboard" component={Dashboard}/>
-							<Route exact path="/login" component={Login}/>
-							<Route exact path="/newgame" component={NewGame}/>
-							<Route exact path="/game/:id" component={GamePage}/>
-							<Route exact path="*" component={PageNotFound}/>
-						</Switch>
-					</div>
-				</div>
-				<div className="footer">
-					<Footer />
-				</div>
-			</Fabric>
+			<Provider inject={[auth, feed]}>
+				<Subscribe to={[AuthContainer, FeedbackContainer]}>
+					{(authStore, feedStore) => (
+						<Fabric className="App">
+							<div className="header">
+								<NavBar authStore={authStore}/>
+							</div>
+							<div className="body">
+								<div className="content">
+
+									<Switch>
+										{/*<Route exact path="/" component={About} />*/}
+										<Route exact path="/games" render={() => <Dashboard feedStore={feedStore}/>} />
+										<Route exact path="/login" render={() => <Login authStore={authStore} feedStore={feedStore} />} />
+										<Route exact path="/newgame" render={() => <NewGame feedStore={feedStore} />} />
+										<Route exact path="/game/:id" render={(props) => <GamePage feedStore={feedStore} appid={props.match.params.id} />} />
+										<Route exact path="*" component={PageNotFound}/>
+									</Switch>
+								</div>
+							</div>
+							{feedStore.state.error ? (
+									<MessageBar
+										messageBarType={ MessageBarType.error }
+										isMultiline={ false }
+									>
+										{feedStore.state.error}
+									</MessageBar>
+								) : (
+									''
+								)}
+							{feedStore.state.info ? (
+									<MessageBar>
+										{feedStore.state.info}
+									</MessageBar>
+								) : (
+									''
+								)}
+							{feedStore.state.success ? (
+									<MessageBar
+										messageBarType={ MessageBarType.success }
+										isMultiline={ false }
+									>
+										{feedStore.state.success}
+									</MessageBar>
+								) : (
+									''
+								)}
+							<div className="footer">
+								<Footer />
+							</div>
+						</Fabric>
+					)}
+				</Subscribe>
+			</Provider>
 		)
 	}
 }
