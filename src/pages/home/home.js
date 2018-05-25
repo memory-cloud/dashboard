@@ -14,8 +14,7 @@ import {Provider} from 'unstated'
 import {Subscribe} from 'unstated'
 import AuthContainer from '../../containers/AuthContainer'
 import FeedbackContainer from '../../containers/FeedbackContainer'
-import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
-
+import Feedback from '../../components/Feedback'
 // Register icons and pull the fonts from the default SharePoint cdn:
 initializeIcons()
 var auth = new AuthContainer()
@@ -44,33 +43,7 @@ class App extends Component {
 									</Switch>
 								</div>
 							</div>
-							{feedStore.state.error ? (
-									<MessageBar
-										messageBarType={ MessageBarType.error }
-										isMultiline={ false }
-									>
-										{feedStore.state.error}
-									</MessageBar>
-								) : (
-									''
-								)}
-							{feedStore.state.info ? (
-									<MessageBar>
-										{feedStore.state.info}
-									</MessageBar>
-								) : (
-									''
-								)}
-							{feedStore.state.success ? (
-									<MessageBar
-										messageBarType={ MessageBarType.success }
-										isMultiline={ false }
-									>
-										{feedStore.state.success}
-									</MessageBar>
-								) : (
-									''
-								)}
+							<Feedback feedStore={feedStore}/>
 							<div className="footer">
 								<Footer />
 							</div>
