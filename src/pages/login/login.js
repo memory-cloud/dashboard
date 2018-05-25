@@ -1,10 +1,10 @@
 import React, {Component} from 'react'
 import gql from 'graphql-tag'
+import './style.css'
 import {withApollo} from 'react-apollo'
-import {CompoundButton} from 'office-ui-fabric-react/lib/Button'
+import {CompoundButton, ActionButton} from 'office-ui-fabric-react/lib/Button'
 import {Label} from 'office-ui-fabric-react/lib/Label'
 import { withRouter } from 'react-router'
-import './style.css'
 
 class Login extends Component {
 	state = {
@@ -54,14 +54,16 @@ class Login extends Component {
 		return (
 			<div className="d-flex justify-content-center align-items-center fill">
 				<div className="inputLogin">
+					<div className="center">
+						<ActionButton
+							iconProps={ { iconName: (this.state.login ? 'Up' : 'Door') } }
+							onClick={() => this.setState({login: !this.state.login})}>
+							{this.state.login
+								? 'need to create an account?'
+								: 'already have an account?'}
+						</ActionButton>
+					</div>
 					<Label className="title">{this.state.login ? 'Login' : 'Sign Up'}</Label>
-					<Label
-						onClick={() => this.setState({login: !this.state.login})}
-					>
-						{this.state.login
-							? 'need to create an account?'
-							: 'already have an account?'}
-					</Label>
 						<input
 							name="email"
 							value={this.state.email}
@@ -84,15 +86,16 @@ class Login extends Component {
 								type="password"
 								placeholder="Confirm password"
 							/>}
-					<div>
+					<div className="loginButton">
 						<CompoundButton
+							className="loginButton"
 							onClick={() => this.handleButton()}
 							primary={ true }
 						>
 							{this.state.login ? 'login' : 'create account'}
 						</CompoundButton>
-
 					</div>
+
 				</div>
 			</div>
 		)

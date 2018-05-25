@@ -8,6 +8,16 @@ input {
     border-radius: 5px;
 }
 
+.textContainer-54 {
+    text-align: center;
+}
+
+.center {
+    margin: auto;
+    width: 50%;
+    padding: 10px;
+}
+
 .inputLogin {
     width: 400px;
 }
@@ -19,4 +29,18 @@ input {
 .title {
     font-size: 30px;
     text-align: center;
+}
+
+.subtitle {
+    text-align: center;
+}
+
+.loginButton {
+    width: 100%;
+    text-align: center !important;
+    max-width: none;
+}
+
+.submitBtn {
+    visibility: hidden;
 }
