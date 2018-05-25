@@ -4,7 +4,8 @@ class AuthContainer extends Container {
 	constructor() {
 		super()
 		this.state = {
-			token: localStorage.getItem('auth-token')
+			token: localStorage.getItem('auth-token') || '',
+			user: localStorage.getItem('user') || ''
 		}
 	}
 	setToken = (token) => {
@@ -12,8 +13,16 @@ class AuthContainer extends Container {
 		localStorage.setItem('auth-token', token)
 	}
 	logout = () => {
+		localStorage.setItem('auth-token', '')
+		localStorage.setItem('user', '')
 		this.setState({ token: '', user: '' })
-		localStorage.removeItem('auth-token')
+	}
+	setUser = (user) => {
+		this.setState({ user: user})
+		localStorage.setItem('user', user)
+	}
+	isLogged = () => {
+		return this.state.token !== '' && this.state.user !== ''
 	}
 }
 

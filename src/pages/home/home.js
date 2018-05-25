@@ -35,11 +35,12 @@ class App extends Component {
 
 									<Switch>
 										{/*<Route exact path="/" component={About} />*/}
-										<Route exact path="/games" render={() => <Dashboard feedStore={feedStore}/>} />
+										<Route exact path="/games" render={() => <Dashboard authStore={authStore} feedStore={feedStore}/>} />
 										<Route exact path="/login" render={() => <Login authStore={authStore} feedStore={feedStore} />} />
-										<Route exact path="/newgame" render={() => <NewGame feedStore={feedStore} />} />
-										<Route exact path="/game/:id" render={(props) => <GamePage feedStore={feedStore} appid={props.match.params.id} />} />
+										<Route exact path="/newgame" render={() => <NewGame authStore={authStore} feedStore={feedStore} />} />
+										<Route exact path="/game/:id" render={(props) => <GamePage authStore={authStore} feedStore={feedStore} appid={props.match.params.id} />} />
 										<Route exact path="*" component={PageNotFound}/>
+
 									</Switch>
 								</div>
 							</div>

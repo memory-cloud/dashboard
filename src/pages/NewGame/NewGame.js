@@ -6,6 +6,7 @@ import { PrimaryButton } from 'office-ui-fabric-react/lib/Button'
 
 class GamePage extends Component {
 	state = {
+		name: '',
 		appid: '',
 		key: ''
 	}
@@ -16,10 +17,22 @@ class GamePage extends Component {
 	}
 
 	render() {
+
+		if (!this.props.authStore.isLogged()) {
+			this.props.history.push('/login')
+		}
+
 		return (
 			<div>
 				<h4>New Game</h4>
 				<div>
+					<input
+						name="name"
+						value={this.state.name}
+						onChange={this.handleChange}
+						type="text"
+						placeholder="Name"
+					/>
 					<input
 						name="appid"
 						value={this.state.appid}
@@ -47,11 +60,12 @@ class GamePage extends Component {
 	saveNewGame = async() => {
 		if(this.validate()) {
 			this.props.feedStore.setInfo('Creating new game')
-			const {appid, key} = this.state
+			const {name, appid, key} = this.state
 			try {
 				const result = await this.props.client.mutate({
 					mutation: NEWGAME_MUTATION,
 					variables: {
+						name: name,
 						appid: appid,
 						key: key
 					}
@@ -89,8 +103,9 @@ class GamePage extends Component {
 }
 
 const NEWGAME_MUTATION = gql`
-    mutation game ($appid: String!, $key: String!){
+    mutation game ($appid: String!, $key: String!, $name: String!){
         createGame(game:{
+		    name: $name
             appid: $appid
             key: $key
         })
