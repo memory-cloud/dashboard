@@ -3,6 +3,7 @@ import {withApollo} from 'react-apollo'
 import gql from 'graphql-tag'
 import { withRouter } from 'react-router'
 import { PrimaryButton } from 'office-ui-fabric-react/lib/Button'
+import {Label} from 'office-ui-fabric-react/lib/Label'
 
 class GamePage extends Component {
 	state = {
@@ -23,35 +24,37 @@ class GamePage extends Component {
 		}
 
 		return (
-			<div>
-				<h4>New Game</h4>
-				<div>
-					<input
-						name="name"
-						value={this.state.name}
-						onChange={this.handleChange}
-						type="text"
-						placeholder="Name"
-					/>
-					<input
-						name="appid"
-						value={this.state.appid}
-						onChange={this.handleChange}
-						type="text"
-						placeholder="Facebook app id"
-					/>
-					<input
-						name="key"
-						value={this.state.key}
-						onChange={this.handleChange}
-						type="text"
-						placeholder="Facebook app token"
-					/>
-				</div>
-				<div>
-					<PrimaryButton onClick={() => this.saveNewGame()}>
-						create game
-					</PrimaryButton>
+			<div className="d-flex justify-content-center align-items-center fill">
+				<div className="inputLogin">
+					<Label className="title">New Game</Label>
+					<div>
+						<input
+							name="name"
+							value={this.state.name}
+							onChange={this.handleChange}
+							type="text"
+							placeholder="Name"
+						/>
+						<input
+							name="appid"
+							value={this.state.appid}
+							onChange={this.handleChange}
+							type="text"
+							placeholder="Facebook app id"
+						/>
+						<input
+							name="key"
+							value={this.state.key}
+							onChange={this.handleChange}
+							type="text"
+							placeholder="Facebook app token"
+						/>
+					</div>
+					<div>
+						<PrimaryButton className="loginButton" onClick={() => this.saveNewGame()}>
+							create game
+						</PrimaryButton>
+					</div>
 				</div>
 			</div>
 		)
