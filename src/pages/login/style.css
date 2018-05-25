@@ -9,7 +9,7 @@ input {
 }
 
 .ms-Button-textContainer {
-    text-align: center;
+    text-align: center !important;
 }
 
 .center {
