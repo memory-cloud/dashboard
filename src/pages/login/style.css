@@ -8,14 +8,14 @@ input {
     border-radius: 5px;
 }
 
-.textContainer-54 {
+.ms-Button-textContainer {
     text-align: center;
 }
 
 .center {
     margin: auto;
-    width: 50%;
-    padding: 10px;
+    width: 55%;
+    padding: 0px;
 }
 
 .inputLogin {
