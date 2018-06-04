@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import gql from 'graphql-tag'
 import './style.css'
 import {withApollo} from 'react-apollo'
 import {CompoundButton, ActionButton} from 'office-ui-fabric-react/lib/Button'
@@ -19,22 +18,23 @@ class Login extends Component {
 		this.setState(() => ({ [name]: value }))
 	}
 
-	validade = () => {
+	isValid = () => {
 		const {email, password, password2} = this.state
+		const {feedStore} = this.props
 
 		if (email === '') {
-			this.props.feedStore.setError('Email can\'t be empty')
+			feedStore.setError('Email is required')
 			return false
 		}
 		var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
 		if(!re.test(email)){
-			this.props.feedStore.setError(email + ' is not a valid email')
+			feedStore.setError('Email is not valid')
 			return false
 		}
 
 		if(password === '') {
-			this.props.feedStore.setError('Password can\'t be empty')
+			feedStore.setError('Password required')
 			return false
 		}
 
@@ -43,7 +43,7 @@ class Login extends Component {
 		}
 
 		if(password !== password2){
-			this.props.feedStore.setError('Passwords do not match')
+			feedStore.setError('Passwords do not match')
 			return false
 		}
 
@@ -103,67 +103,33 @@ class Login extends Component {
 
 	handleButton = async () => {
 		const {email, password} = this.state
-		if (this.validade()) {
-			if (this.state.login) {
-				this.props.feedStore.setInfo('Checking credentials, please wait.')
-				try {
-					const result = await this.props.client.query({
-						query: LOGIN_MUTATION,
-						variables: {
-							email: email,
-							password: password
-						}
-					})
-					const token = result.data.login
-					this._saveUserData(token)
-					this.props.history.push('/games')
-					this.props.feedStore.setSuccess('')
-				} catch (err) {
-					this.props.feedStore.setError(err.graphQLErrors[0].message)
-				}
-			} else {
-				this.props.feedStore.setInfo('Registering, please wait.')
-				try {
-					const result = await this.props.client.mutate({
-						mutation: SIGNUP_MUTATION,
-						variables: {
-							email: email,
-							password: password
-						}
-					})
-					const token = result.data.createUser
-					this._saveUserData(token)
-					this.props.history.push('/games')
-					this.props.feedStore.setSuccess('')
-				} catch (err) {
-					this.props.feedStore.setError(err.graphQLErrors[0].message)
-				}
+		if (!this.isValid()) {
+			return
+		}
+
+		const {client, authStore, feedStore} = this.props
+		if (this.state.login) {
+			feedStore.setInfo('Checking credentials, please wait.')
+			try {
+				await authStore.login(client, email, password)
+				await authStore.fetchMe(client)
+				this.props.history.push('/games')
+				feedStore.clear()
+			} catch (err) {
+				feedStore.setError(err.message)
+			}
+		} else {
+			feedStore.setInfo('Registering, please wait.')
+			try {
+				await authStore.register(client, email, password)
+				await authStore.fetchMe(client)
+				this.props.history.push('/games')
+				feedStore.clear()
+			} catch (err) {
+				feedStore.setError(err.message)
 			}
 		}
 	}
-
-	_saveUserData = (token) => {
-		this.props.authStore.setToken(token)
-	}
 }
-
-
-const SIGNUP_MUTATION = gql`
-    mutation newuser ($email: String!, $password: String!) {
-        createUser(
-            email: $email,
-            password: $password
-        )
-    }
-`
-
-const LOGIN_MUTATION = gql`
-    query log ($email: String!, $password: String!) {
-        login (
-            email: $email,
-            password: $password
-        )
-    }
-`
 
 export default withRouter(withApollo(Login))

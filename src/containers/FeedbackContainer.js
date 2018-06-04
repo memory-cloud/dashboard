@@ -1,8 +1,9 @@
-import { Container } from 'unstated'
+import React from "react";
+import { Container, Provider, Subscribe } from 'unstated'
 
 class FeedbackContainer extends Container {
 	constructor() {
-		super();
+		super()
 		this.state = {
 			error: '',
 			info: '',
@@ -21,6 +22,23 @@ class FeedbackContainer extends Container {
 		this.setState({ error: '', info: '', success: success })
 		if (seconds) setTimeout(()=> this.setState({ error: '', info: '', success: '' }), seconds * 1000)
 	}
+	clear = () => {
+		this.setState({ error: '', info: '', success: '' })
+	}
 }
 
-export default FeedbackContainer
+const feed = new FeedbackContainer()
+
+export const FeedProvider = props => {
+	return <Provider inject={props.inject || [feed]}>{props.children}</Provider>
+}
+
+export const FeedSubscribe = props => {
+	return <Subscribe to={props.to || [feed]}>{props.children}</Subscribe>
+}
+
+export const FeedStore = props => {
+	return (<FeedProvider><FeedSubscribe>{props.children}</FeedSubscribe></FeedProvider>)
+}
+
+export default feed

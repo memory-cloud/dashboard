@@ -1,112 +1,91 @@
 import React, {Component} from 'react'
-import {graphql} from 'react-apollo'
-import gql from 'graphql-tag'
 import {withApollo} from 'react-apollo'
 import Loading from '../../components/Loading'
 import {CompoundButton, ActionButton} from 'office-ui-fabric-react/lib/Button'
 
 class Achievement extends Component {
-	constructor(props){
+	constructor(props) {
 		super(props)
-		this.state = {
-			achievements: props.data.game ? props.data.game.achievements : [{_id: '', title: '', description: ''}],
-			saving: false
-		}
+		const {client, achievementStore, appid} = props
+
+		achievementStore.getAchievements(client, appid)
 	}
 
-	componentWillReceiveProps(props) {
-		if (!props.data.loading && !this.state.saving) {
-			this.setState({achievements: props.data.game.achievements})
-		}
-	}
+	isValid = () => {
+		const {achievementStore} = this.props
+		achievementStore.state.achievements.forEach((achievement, idx) => {
+			if ( !achievement.title.match( /^[A-Za-z0-9_]{1,15}$/ ) ) {
+				throw new Error('Invalid title ' + idx + 1)
+			}
 
-	handleAddAchievement = () => {
-		this.setState({achievements: this.state.achievements.concat([{_id: '', title: '', description: ''}])})
-	}
-
-	handleAchievementTitleChange = (idx) => (evt) => {
-		const newAchievements = this.state.achievements.map((achievement, sidx) => {
-			if (idx !== sidx) return achievement;
-			return {...achievement, title: evt.target.value}
-		});
-		this.setState({achievements: newAchievements})
-	}
-
-	handleAchievementDescriptionChange = (idx) => (evt) => {
-		const newAchievements = this.state.achievements.map((achievement, sidx) => {
-			if (idx !== sidx) return achievement;
-			return {...achievement, description: evt.target.value}
+			if ( !achievement.description.match( /^[A-Za-z0-9_]{1,15}$/ ) ) {
+				throw new Error('Invalid description ' + idx + 1)
+			}
 		})
-		this.setState({achievements: newAchievements})
+		return true
 	}
 
-	upsertAchievements  = async () => {
-		this.setState({saving: true})
+	upsertAchievements = async() => {
+		const {client, achievementStore, feedStore, appid} = this.props
 		try {
-			this.props.feedStore.setInfo('Saving')
+			this.isValid()
 
-			const {achievements} = this.state
+			feedStore.setInfo('Saving')
 
-			const update = achievements.map((achievement)=>({
+			const {achievements} = achievementStore.state
+
+			const update = achievements.map((achievement) => ({
 				_id: achievement._id,
 				title: achievement.title,
 				description: achievement.description
 			}))
 
-			await this.props.client.mutate({
-				mutation: MUTATION_UPSERTACHIEVEMENTS,
-				variables: {
-					appid: this.props.appid,
-					achievements: update
-				}
-			})
-
-			this.props.feedStore.setSuccess('Achievements updated')
-			this.props.data.refetch()
+			await achievementStore.upsertAchievements(client, appid, update)
+			feedStore.setSuccess('Achievements updated', 6)
 		} catch (err) {
-			this.props.feedStore.setError(err.graphQLErrors[0].message, 10)
+			feedStore.setError(err.message, 10)
 		}
 	}
 
 	render() {
-		const {data} = this.props
+		const {loading, achievements, error} = this.props.achievementStore.state
 
-		if (data.loading) {
+		if (loading) {
 			return (<Loading/>)
 		}
 
-		if (data.error) {
-			return (<div> Error </div>)
+		if (error) {
+			return (<div> {error} </div>)
 		}
 
 		return (
 			<div>
 				<ActionButton
-					iconProps={ { iconName: 'Add' } }
+					iconProps={ {iconName: 'Add'} }
 					text='new'
-					onClick={this.handleAddAchievement}
+					onClick={this.props.achievementStore.handleAddAchievement}
 				/>
-				{this.state.achievements.map((achievement, idx) => (
+				{achievements.map((achievement, idx) => (
 					<div key={idx}>
 						<input
 							type="text"
 							value={achievement._id}
 							hidden
-						    readOnly
+							readOnly
 						/>
 						<input
 							name="title"
 							type="text"
 							placeholder={`Achievement #${idx + 1} title`}
 							value={achievement.title}
-							onChange={this.handleAchievementTitleChange(idx)}
+							onChange={this.props.achievementStore.handleChange(idx)}
 						/>
 						<input
 							name="description"
 							type="text"
 							placeholder={`Achievement #${idx + 1} description`}
 							value={achievement.description}
-							onChange={this.handleAchievementDescriptionChange(idx)}
+							onChange={this.props.achievementStore.handleChange(idx)}
 						/>
 					</div>
 				))}
@@ -116,35 +95,4 @@ class Achievement extends Component {
 	}
 }
 
-const QUERY_ACHIEVEMENTS = gql`
-    query ($appid: String!){
-        game (appid: $appid) {
-            achievements{
-                _id
-                title
-                description
-            }
-        }
-    }
-`
-
-const MUTATION_UPSERTACHIEVEMENTS = gql`
-    mutation ($appid: String!, $achievements: [AchievementInput!]!) {
-        upsertAchievements(
-            appid: $appid
-            achievements: $achievements
-        ){
-            _id
-            title
-            description
-        }
-    }
-`
-
-export default withApollo(graphql(QUERY_ACHIEVEMENTS, {
-	options: (props) => {
-		return {
-			variables: {appid: props.appid}
-		}
-	}
-})(Achievement))
+export default withApollo(Achievement)
