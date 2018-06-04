@@ -11,8 +11,8 @@ import {setContext} from 'apollo-link-context'
 import {BrowserRouter} from 'react-router-dom'
 
 // const httpLink = new createHttpLink({uri: 'https://unity-cloudsave-development.herokuapp.com/graphql'})
-// const httpLink = new createHttpLink({uri: 'https://memory-cloud.herokuapp.com/graphql'})
-const httpLink = new createHttpLink({uri: 'http://localhost:3000/graphql'})
+const httpLink = new createHttpLink({uri: 'https://memory-cloud.herokuapp.com/graphql'})
+// const httpLink = new createHttpLink({uri: 'http://localhost:3000/graphql'})
 
 const authLink = setContext((_, {headers}) => {
 	// get the authentication token from local storage if it exists
