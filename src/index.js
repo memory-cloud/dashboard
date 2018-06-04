@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import './style.css'
-import Home from './pages/home'
+import App from './app'
 import registerServiceWorker from './registerServiceWorker'
 import {ApolloClient} from 'apollo-client'
 import {createHttpLink} from 'apollo-link-http'
@@ -11,8 +11,8 @@ import {setContext} from 'apollo-link-context'
 import {BrowserRouter} from 'react-router-dom'
 
 // const httpLink = new createHttpLink({uri: 'https://unity-cloudsave-development.herokuapp.com/graphql'})
-const httpLink = new createHttpLink({uri: 'https://memory-cloud.herokuapp.com/graphql'})
-// const httpLink = new createHttpLink({uri: 'http://localhost:3000/graphql'})
+// const httpLink = new createHttpLink({uri: 'https://memory-cloud.herokuapp.com/graphql'})
+const httpLink = new createHttpLink({uri: 'http://localhost:3000/graphql'})
 
 const authLink = setContext((_, {headers}) => {
 	// get the authentication token from local storage if it exists
@@ -34,7 +34,7 @@ const client = new ApolloClient({
 ReactDOM.render(
 	<BrowserRouter basename="/dashboard">
 		<ApolloProvider client={client}>
-			<Home/>
+			<App/>
 		</ApolloProvider>
 	</BrowserRouter>, document.getElementById('root'));
 registerServiceWorker()

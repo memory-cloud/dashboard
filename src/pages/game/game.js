@@ -1,6 +1,4 @@
 import React, {Component} from 'react'
-import {graphql} from 'react-apollo'
-import gql from 'graphql-tag'
 import Loading from '../../components/Loading'
 import {Pivot, PivotItem} from 'office-ui-fabric-react/lib/Pivot';
 import Achievement from '../achievement'
@@ -9,15 +7,17 @@ import './style.css'
 import {withRouter} from 'react-router'
 import {DefaultButton} from 'office-ui-fabric-react/lib/Button';
 import {TeachingBubble} from 'office-ui-fabric-react/lib/TeachingBubble';
+import {withApollo} from 'react-apollo'
+import {AchievementStore} from '../../containers/AchievementContainer'
 
 class GamePage extends Component {
 	constructor(props) {
 		super(props)
 		this._onDismiss = this._onDismiss.bind(this)
-
 		this.state = {
 			isTeachingBubbleVisible: false,
 		}
+		props.gameStore.getGame(props.client, props.appid)
 	}
 
 	_onDismiss() {
@@ -29,22 +29,16 @@ class GamePage extends Component {
 
 	render() {
 
-		if (!this.props.authStore.isLogged()) {
-			this.props.history.push('/login')
-		}
-
 		const {isTeachingBubbleVisible} = this.state
-		const {data} = this.props
+		const {loading, game} = this.props.gameStore.state
 
-		if (data.loading) {
+		if (loading) {
 			return (<Loading />)
 		}
 
-		if (!data.game) {
-			return (<div> Error </div>)
+		if (!game) {
+			return ('Error')
 		}
-
-		var game = data.game
 
 		return (
 			<div>
@@ -79,7 +73,11 @@ class GamePage extends Component {
 						</div>
 					</PivotItem>
 					<PivotItem linkText='Achievements'>
-						<Achievement appid={game.appid} feedStore={this.props.feedStore}/>
+						<AchievementStore>
+							{achievementStore => (
+								<Achievement achievementStore={achievementStore} appid={game.appid} feedStore={this.props.feedStore}/>
+							)}
+						</AchievementStore>
 					</PivotItem>
 					<PivotItem linkText='Stats'>
 						<Stats appid={game.appid}/>
@@ -90,18 +88,4 @@ class GamePage extends Component {
 	}
 }
 
-const QUERY_GAME = gql`
-    query ($appid: String!){
-        game (appid: $appid) {
-            name
-            appid
-            key
-        }
-    }
-`
-
-export default graphql(QUERY_GAME, {
-	options: ({appid}) => {
-		return {variables: {appid: appid}}
-	}
-})(withRouter(GamePage))
+export default withRouter(withApollo(GamePage))

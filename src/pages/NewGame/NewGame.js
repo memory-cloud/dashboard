@@ -1,6 +1,5 @@
 import React, {Component} from 'react'
 import {withApollo} from 'react-apollo'
-import gql from 'graphql-tag'
 import { withRouter } from 'react-router'
 import { PrimaryButton } from 'office-ui-fabric-react/lib/Button'
 import {Label} from 'office-ui-fabric-react/lib/Label'
@@ -18,11 +17,6 @@ class GamePage extends Component {
 	}
 
 	render() {
-
-		if (!this.props.authStore.isLogged()) {
-			this.props.history.push('/login')
-		}
-
 		return (
 			<div className="d-flex justify-content-center align-items-center fill">
 				<div className="inputLogin">
@@ -30,21 +24,18 @@ class GamePage extends Component {
 					<div>
 						<input
 							name="name"
-							value={this.state.name}
 							onChange={this.handleChange}
 							type="text"
 							placeholder="Name"
 						/>
 						<input
 							name="appid"
-							value={this.state.appid}
 							onChange={this.handleChange}
 							type="text"
 							placeholder="Facebook app id"
 						/>
 						<input
 							name="key"
-							value={this.state.key}
 							onChange={this.handleChange}
 							type="text"
 							placeholder="Facebook app token"
@@ -63,17 +54,12 @@ class GamePage extends Component {
 	saveNewGame = async() => {
 		if(this.validate()) {
 			this.props.feedStore.setInfo('Creating new game')
+
+
 			const {name, appid, key} = this.state
+			const {client, gameStore} = this.props
 			try {
-				const result = await this.props.client.mutate({
-					mutation: NEWGAME_MUTATION,
-					variables: {
-						name: name,
-						appid: appid,
-						key: key
-					}
-				})
-				console.log(result)
+				await gameStore.newGame(client, name, appid, key)
 				this.props.feedStore.setSuccess('')
 				this.props.history.push('/game/' + appid)
 			} catch (err) {
@@ -105,14 +91,5 @@ class GamePage extends Component {
 	}
 }
 
-const NEWGAME_MUTATION = gql`
-    mutation game ($appid: String!, $key: String!, $name: String!){
-        createGame(game:{
-		    name: $name
-            appid: $appid
-            key: $key
-        })
-    }
-`
 
 export default withApollo(withRouter(GamePage))
