@@ -10,9 +10,7 @@ import {ApolloProvider} from 'react-apollo'
 import {setContext} from 'apollo-link-context'
 import {BrowserRouter} from 'react-router-dom'
 
-// const httpLink = new createHttpLink({uri: 'https://unity-cloudsave-development.herokuapp.com/graphql'})
-const httpLink = new createHttpLink({uri: 'https://memory-cloud.herokuapp.com/graphql'})
-// const httpLink = new createHttpLink({uri: 'http://localhost:3000/graphql'})
+const httpLink = new createHttpLink({uri: 'https://192.168.99.100/graphql'})
 
 const authLink = setContext((_, {headers}) => {
 	// get the authentication token from local storage if it exists
@@ -21,7 +19,7 @@ const authLink = setContext((_, {headers}) => {
 	return {
 		headers: {
 			...headers,
-			admintoken: admintoken ? `${admintoken}` : ""
+			authorization: admintoken ? `admin ${admintoken}` : ""
 		}
 	}
 })
