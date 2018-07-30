@@ -94,7 +94,9 @@ const NEWGAME_MUTATION = gql`
             name: $name
             appid: $appid
             key: $key
-        })
+        }) {
+			_id
+		}
     }
 `
 
